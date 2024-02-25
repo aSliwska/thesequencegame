@@ -11,12 +11,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Divider
@@ -33,6 +37,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -43,10 +48,15 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowCompat.setDecorFitsSystemWindows
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.example.thesequencegame.ui.NavGraphs
 import com.example.thesequencegame.ui.common_components.SequenceButton
 import com.example.thesequencegame.ui.select_game_mode.SelectGameModeScreen
 import com.example.thesequencegame.ui.theme.SequenceTypography
 import com.example.thesequencegame.ui.theme.TheSequenceGameTheme
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.animations.defaults.NestedNavGraphDefaultAnimations
+import com.ramcosta.composedestinations.animations.defaults.RootNavGraphDefaultAnimations
+import com.ramcosta.composedestinations.rememberNavHostEngine
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -78,94 +88,18 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TheSequenceGameApp() {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet(
-                drawerShape = MaterialTheme.shapes.extraLarge,
-                modifier = Modifier.fillMaxWidth(0.75f)
-            ) {
-                Column {
-                    MiniSequenceGame()
-
-                    Divider(
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(8.dp),
-                    )
-
-                    Surface(
-                        color = MaterialTheme.colorScheme.onSurface,
-                        shape = MaterialTheme.shapes.large,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                    ) {
-                        Column {
-                            DrawerMenuButton(
-                                text = "New game",
-                                icon = R.drawable.play_filled,
-                                onClick = { /*TODO*/ }
-                            )
-
-                            DrawerMenuButton(
-                                text = "High scores",
-                                icon = R.drawable.leaderboard_filled,
-                                onClick = { /*TODO*/ }
-                            )
-
-                            DrawerMenuButton(
-                                text = "Themes",
-                                icon = R.drawable.palette_filled,
-                                onClick = { /*TODO*/ }
-                            )
-
-                            DrawerMenuButton(
-                                text = "Settings",
-                                icon = R.drawable.settings_filled,
-                                onClick = { /*TODO*/ }
-                            )
-                        }
-                    }
-
-
-                }
-            }
-        },
-    ) {
-        SelectGameModeScreen(
-            extendDrawer = {
-                scope.launch {
-                    drawerState.apply {
-                        if (isClosed) open() else close()
-                    }
-                }
-            }
+    val navHostEngine = rememberNavHostEngine(
+        navHostContentAlignment = Alignment.TopCenter,
+        rootDefaultAnimations = RootNavGraphDefaultAnimations(
+            enterTransition = { fadeIn(animationSpec = tween(200)) },
+            exitTransition = { fadeOut(animationSpec = tween(200)) }
         )
-    }
-}
+    )
 
-@Composable
-private fun DrawerMenuButton(
-    text: String,
-    icon: Int,
-    onClick: () -> Unit
-) {
-    SequenceButton(
-        text = text,
-        textColor = MaterialTheme.colorScheme.background,
-        backgroundColor = Color.Transparent,
-        icon = icon,
-        contentDescription = text,
-        modifier = Modifier.padding(8.dp).fillMaxWidth(),
-        onClick = onClick
+    DestinationsNavHost(
+        navGraph = NavGraphs.root,
+        engine = navHostEngine,
     )
 }
 
-@Composable
-private fun MiniSequenceGame() {
-
-}

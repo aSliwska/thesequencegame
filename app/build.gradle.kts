@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp") version "1.9.0-1.0.13"
 }
 
 android {
@@ -67,4 +68,6 @@ dependencies {
 
     implementation("androidx.compose.ui:ui-text-google-fonts:1.6.1")
     implementation("androidx.activity:activity-ktx:1.8.2")
+    implementation("io.github.raamcosta.compose-destinations:core:1.11.0-alpha")
+    ksp("io.github.raamcosta.compose-destinations:ksp:1.11.0-alpha")
 }

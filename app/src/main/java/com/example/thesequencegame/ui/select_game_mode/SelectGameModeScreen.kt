@@ -55,62 +55,83 @@ import androidx.compose.ui.unit.sp
 import com.example.thesequencegame.R
 import com.example.thesequencegame.ui.common_components.SequenceButton
 import com.example.thesequencegame.ui.common_components.SequenceIconButton
+import com.example.thesequencegame.ui.common_components.SequenceNavigationDrawer
 import com.example.thesequencegame.ui.common_components.SequenceTitle
 import com.example.thesequencegame.ui.common_components.SequenceTopBar
+import com.example.thesequencegame.ui.destinations.GameScreenDestination
 import com.example.thesequencegame.ui.theme.SequenceTypography
 import com.example.thesequencegame.ui.theme.TheSequenceGameTheme
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@RootNavGraph(start = true)
+@Destination
 @Composable
 fun SelectGameModeScreen(
-    extendDrawer: () -> Unit
+    navigator: DestinationsNavigator
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        SequenceTopBar(
-            leftIcon = {
-                SequenceIconButton(
-                    icon = R.drawable.menu,
-                    contentDescription = "menu",
-                    onClick = extendDrawer
-                )
-            },
-            rightIcon = {
-                SequenceIconButton(
-                    icon = R.drawable.question,
-                    contentDescription = "how to play"
-                ) {
-                    /*TODO*/
-                }
-            }
-        )
-
+    SequenceNavigationDrawer(navigator) { extendDrawer ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween, // TODO this might clip into status bar, only works by accident
+            modifier = Modifier.fillMaxSize()
         ) {
-            SequenceTitle(text = "NEW GAME")
-            Spacer(Modifier.height(64.dp))
+            SequenceTopBar(
+                leftIcon = {
+                    SequenceIconButton(
+                        icon = R.drawable.menu,
+                        contentDescription = "menu",
+                        onClick = extendDrawer
+                    )
+                },
+                rightIcon = {
+                    SequenceIconButton(
+                        icon = R.drawable.question,
+                        contentDescription = "how to play"
+                    ) {
+                        /* TODO */
+                    }
+                }
+            )
 
-            GameModeCard(
-                "Classic",
-                "The whole sequence is always shown."
-            )
-            Spacer(Modifier.height(40.dp))
-            GameModeCard(
-                "Lighting Round",
-                "Only the end of the sequence is shown."
-            )
-            Spacer(Modifier.height(40.dp))
-            GameModeCard(
-                "Hardcore",
-                "The length of the visible part of the sequence decreases."
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                SequenceTitle(text = "NEW GAME")
+
+                Spacer(Modifier.height(64.dp))
+
+                GameModeCard(
+                    name = "Classic",
+                    description = "The whole sequence is always shown.",
+                    onClick = {
+                        navigator.navigate(GameScreenDestination())
+                    },
+                    onSettingsClick = { /* TODO */ },
+                )
+
+                Spacer(Modifier.height(40.dp))
+
+                GameModeCard(
+                    name = "Lighting Round",
+                    description = "Only the end of the sequence is shown.",
+                    onClick = { /* TODO */ },
+                    onSettingsClick = { /* TODO */ },
+                )
+
+                Spacer(Modifier.height(40.dp))
+
+                GameModeCard(
+                    name = "Hardcore",
+                    description = "The length of the visible part of the sequence decreases.",
+                    onClick = { /* TODO */ },
+                    onSettingsClick = { /* TODO */ },
+                )
+            }
+
+            Spacer(modifier = Modifier.height(136.dp))
         }
-
-//        Spacer(modifier = Modifier.height(88.dp))
-        Spacer(modifier = Modifier.height(136.dp))
     }
 }
 
@@ -118,6 +139,8 @@ fun SelectGameModeScreen(
 private fun GameModeCard(
     name: String,
     description: String,
+    onClick: () -> Unit,
+    onSettingsClick: () -> Unit,
 ) {
     Column(
         Modifier
@@ -130,19 +153,17 @@ private fun GameModeCard(
         ) {
             SequenceButton(
                 text = name,
+                onClick = onClick,
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
-            ) {
-                /*TODO*/
-            }
+            )
 
             SequenceIconButton(
                 icon = R.drawable.settings_filled,
-                contentDescription = "mode settings"
-            ) {
-                /*TODO*/
-            }
+                contentDescription = "mode settings",
+                onClick = onSettingsClick,
+            )
         }
 
         Spacer(Modifier.height(8.dp))
