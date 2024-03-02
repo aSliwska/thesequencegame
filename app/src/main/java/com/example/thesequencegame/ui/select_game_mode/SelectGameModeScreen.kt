@@ -1,14 +1,6 @@
 package com.example.thesequencegame.ui.select_game_mode
 
-import android.view.MotionEvent
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,42 +8,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.rounded.Menu
-import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material.icons.sharp.Settings
-import androidx.compose.material.icons.twotone.Settings
-import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInteropFilter
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.thesequencegame.R
 import com.example.thesequencegame.ui.common_components.SequenceButton
 import com.example.thesequencegame.ui.common_components.SequenceIconButton
@@ -60,7 +25,6 @@ import com.example.thesequencegame.ui.common_components.SequenceTitle
 import com.example.thesequencegame.ui.common_components.SequenceTopBar
 import com.example.thesequencegame.ui.destinations.GameScreenDestination
 import com.example.thesequencegame.ui.theme.SequenceTypography
-import com.example.thesequencegame.ui.theme.TheSequenceGameTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -71,10 +35,12 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun SelectGameModeScreen(
     navigator: DestinationsNavigator
 ) {
+    var showHowToPlayDialog by remember { mutableStateOf(false) }
+
     SequenceNavigationDrawer(navigator) { extendDrawer ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween, // TODO this might clip into status bar, only works by accident
+            verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxSize()
         ) {
             SequenceTopBar(
@@ -90,7 +56,7 @@ fun SelectGameModeScreen(
                         icon = R.drawable.question,
                         contentDescription = "how to play"
                     ) {
-                        /* TODO */
+                        showHowToPlayDialog = true
                     }
                 }
             )
@@ -98,9 +64,13 @@ fun SelectGameModeScreen(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                SequenceTitle(text = "NEW GAME")
+                Spacer(
+                    Modifier
+                        .height(0.dp)
+                        .weight(0.1f)
+                )
 
-                Spacer(Modifier.height(64.dp))
+                SequenceTitle(text = "NEW GAME", modifier = Modifier.weight(0.15f))
 
                 GameModeCard(
                     name = "Classic",
@@ -109,28 +79,31 @@ fun SelectGameModeScreen(
                         navigator.navigate(GameScreenDestination())
                     },
                     onSettingsClick = { /* TODO */ },
+                    modifier = Modifier.weight(0.15f)
                 )
-
-                Spacer(Modifier.height(40.dp))
 
                 GameModeCard(
                     name = "Lighting Round",
                     description = "Only the end of the sequence is shown.",
                     onClick = { /* TODO */ },
                     onSettingsClick = { /* TODO */ },
+                    modifier = Modifier.weight(0.15f)
                 )
-
-                Spacer(Modifier.height(40.dp))
 
                 GameModeCard(
                     name = "Hardcore",
                     description = "The length of the visible part of the sequence decreases.",
                     onClick = { /* TODO */ },
                     onSettingsClick = { /* TODO */ },
+                    modifier = Modifier.weight(0.4f)
                 )
             }
+        }
+    }
 
-            Spacer(modifier = Modifier.height(136.dp))
+    if (showHowToPlayDialog) {
+        HowToPlayDialog {
+            showHowToPlayDialog = false
         }
     }
 }
@@ -141,9 +114,10 @@ private fun GameModeCard(
     description: String,
     onClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(start = 32.dp, end = 16.dp)
     ) {
@@ -153,6 +127,7 @@ private fun GameModeCard(
         ) {
             SequenceButton(
                 text = name,
+                arrangement = Arrangement.Start,
                 onClick = onClick,
                 modifier = Modifier
                     .weight(1f)

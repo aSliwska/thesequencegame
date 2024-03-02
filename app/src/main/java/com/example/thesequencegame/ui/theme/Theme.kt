@@ -1,48 +1,67 @@
 package com.example.thesequencegame.ui.theme
 
-import android.app.Activity
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import com.example.thesequencegame.ui.themes.ThemesViewModel
 
-private val LightBrownColorScheme = lightColorScheme(
+val LightBrownColorScheme = lightColorScheme(
     background = CremeColor,
     onBackground = DarkBrownColor,
     primary = LightBrownColor,
     onPrimary = DarkBrownColor,
+    inversePrimary = LightBrownFlashColor,
     secondary = LightGreenColor,
     onSecondary = GreenColor,
     tertiary = LightRedColor,
     onTertiary = RedColor,
     surface = ChocolateBrownColor,
-    onSurface = BrownColor,
+    inverseSurface = BrownColor,
+    onSurface = CremeColor,
+)
+
+val DarkPurpleColorScheme = darkColorScheme(
+    background = DarkPurpleColor,
+    onBackground = LightWhitePurpleColor,
+    primary = LightPurpleColor,
+    onPrimary = DarkPurpleColor,
+    inversePrimary = LightWhitePurpleColor, // LightPurpleFlashColor
+    secondary = LightGreenColor,
+    onSecondary = GreenColor,
+    tertiary = LightYellowColor,
+    onTertiary = DarkOrangeColor,
+    surface = MutedPurpleColor,
+    inverseSurface = MutedGrayPurpleColor,
+    onSurface = LightWhitePurpleColor,
+)
+
+val DarkGrayColorScheme = darkColorScheme(
+    background = DarkGrayColor,
+    onBackground = LightWhiteGrayColor,
+    primary = LightGrayColor,
+    onPrimary = DarkGrayColor,
+    inversePrimary = LightWhiteGrayColor, // LightGrayFlashColor
+    secondary = LightGreenColor,
+    onSecondary = GreenColor,
+    tertiary = LightRedColor,
+    onTertiary = RedColor,
+    surface = GrayColor,
+    inverseSurface = MutedGrayColor,
+    onSurface = LightWhiteGrayColor,
 )
 
 @Composable
 fun TheSequenceGameTheme(
-//        darkTheme: Boolean = isSystemInDarkTheme(),
-        content: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
-//    val colorScheme = when {
-//        darkTheme -> DarkColorScheme
-//        else -> LightBrownColorScheme
-//    }
-
-    val colorScheme = LightBrownColorScheme
+    val viewModel = remember { ThemesViewModel }
+    val theme = viewModel.currentTheme.collectAsState()
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = theme.value.colorScheme,
         typography = SequenceTypography,
         content = content
     )

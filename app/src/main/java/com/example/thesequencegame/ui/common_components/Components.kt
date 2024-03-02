@@ -10,151 +10,49 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
-import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.example.thesequencegame.R
-import com.example.thesequencegame.ui.destinations.HighScoresScreenDestination
-import com.example.thesequencegame.ui.destinations.SelectGameModeScreenDestination
-import com.example.thesequencegame.ui.destinations.SettingsScreenDestination
-import com.example.thesequencegame.ui.destinations.ThemesScreenDestination
-import com.example.thesequencegame.ui.game.GameBoard
 import com.example.thesequencegame.ui.theme.SequenceTypography
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.launch
 
 @Composable
-fun SequenceNavigationDrawer(
-    navigator: DestinationsNavigator,
-    content: @Composable (extendDrawer: () -> Unit) -> Unit
-) {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet(
-                drawerShape = RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp),
-                modifier = Modifier.fillMaxWidth(0.75f)
-            ) {
-                Column {
-                    GameBoard(
-                        buttonSize = 4.dp,
-                        spacerSize = 1.dp,
-                    )
-
-                    Divider(
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(8.dp),
-                    )
-
-                    Surface(
-                        color = MaterialTheme.colorScheme.onSurface,
-                        shape = MaterialTheme.shapes.large,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                    ) {
-                        Column {
-                            DrawerMenuButton(
-                                text = "New game",
-                                icon = R.drawable.play_filled,
-                                onClick = {
-                                    navigator.navigate(SelectGameModeScreenDestination())
-                                }
-                            )
-
-                            DrawerMenuButton(
-                                text = "High scores",
-                                icon = R.drawable.leaderboard_filled,
-                                onClick = {
-                                    navigator.navigate(HighScoresScreenDestination())
-                                }
-                            )
-
-                            DrawerMenuButton(
-                                text = "Themes",
-                                icon = R.drawable.palette_filled,
-                                onClick = {
-                                    navigator.navigate(ThemesScreenDestination())
-                                }
-                            )
-
-                            DrawerMenuButton(
-                                text = "Settings",
-                                icon = R.drawable.settings_filled,
-                                onClick = {
-                                    navigator.navigate(SettingsScreenDestination())
-                                }
-                            )
-                        }
-                    }
-
-
-                }
-            }
-        },
-    ) {
-        content(
-            extendDrawer = {
-                scope.launch {
-                    drawerState.apply {
-                        if (isClosed) open() else close()
-                    }
-                }
-            }
-        )
-    }
-}
-
-@Composable
-private fun DrawerMenuButton(
+fun SequenceTitle(
     text: String,
-    icon: Int,
-    onClick: () -> Unit
+    color: Color = MaterialTheme.colorScheme.onBackground,
+    drawStyle: DrawStyle? = null,
+    fontWeight: FontWeight = FontWeight.Normal,
+    textAlign: TextAlign = TextAlign.Start,
+    modifier: Modifier = Modifier,
 ) {
-    SequenceButton(
-        text = text,
-        textColor = MaterialTheme.colorScheme.background,
-        backgroundColor = Color.Transparent,
-        icon = icon,
-        contentDescription = text,
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-        onClick = onClick
-    )
-}
-
-@Composable
-private fun MiniSequenceGame() {
-
-}
-
-@Composable
-fun SequenceTitle(text: String) {
     Text(
         text = text,
-        style = SequenceTypography.titleLarge
+        style = SequenceTypography.titleLarge.plus(
+            TextStyle(drawStyle = drawStyle)
+        ),
+        color = color,
+        fontWeight = fontWeight,
+        textAlign = textAlign,
+        modifier = modifier
     )
 }
 
@@ -184,27 +82,39 @@ fun SequenceButton(
     textColor: Color = MaterialTheme.colorScheme.onPrimary,
     backgroundColor: Color = MaterialTheme.colorScheme.primary,
     icon: Int? = null,
+    shape: Shape = MaterialTheme.shapes.large,
+    textStyle: TextStyle = SequenceTypography.bodyMedium,
+    arrangement: Arrangement.Horizontal = Arrangement.Center,
     contentDescription: String = "",
+    textModifier: Modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 24.dp),
+    rowModifier: Modifier = Modifier,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     val mutableInteractionSource = remember { MutableInteractionSource() }
     val isPressed = mutableInteractionSource.collectIsPressedAsState()
-    val animatedScale = animateFloatAsState(if (isPressed.value) 0.95f else 1f, label = "animatedScale")
-    val animatedAlpha = animateFloatAsState(if (isPressed.value) 0.8f else 1f, label = "animatedAlpha")
+    val animatedScale = animateFloatAsState(if (isPressed.value) 0.9f else 1f, label = "animatedScale")
+    val animatedAlpha = animateFloatAsState(if (isPressed.value) 0.5f else 1f, label = "animatedAlpha")
 
     Surface(
         color = backgroundColor,
-        shape = MaterialTheme.shapes.large,
+        shape = shape,
         modifier = modifier
             .scale(animatedScale.value)
             .alpha(animatedAlpha.value)
-            .clickable(interactionSource = mutableInteractionSource, indication = null) {
+            .clickable(
+                enabled = enabled,
+                interactionSource = mutableInteractionSource,
+                indication = null
+            ) {
                 onClick()
             }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = arrangement,
+            modifier = rowModifier,
         ) {
             if (icon != null) {
                 Icon(
@@ -214,12 +124,14 @@ fun SequenceButton(
                     modifier = Modifier.size(48.dp)
                 )
             }
-            Text(
-                text = text,
-                color = textColor,
-                style = SequenceTypography.bodyMedium,
-                modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 24.dp)
-            )
+            if (text != "") {
+                Text(
+                    text = text,
+                    color = textColor,
+                    style = textStyle,
+                    modifier = textModifier,
+                )
+            }
         }
     }
 }
@@ -261,7 +173,66 @@ fun SequenceIconButtonWithLabel(
 
         Text(
             text = label,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.bodySmall
         )
     }
+}
+
+@Composable
+fun SequenceDialog(
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Dialog(
+        onDismissRequest = onDismissRequest
+    ) {
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            shape = MaterialTheme.shapes.extraLarge,
+            modifier = modifier,
+        ) {
+            content()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SequenceSlider(
+    value: Float,
+    valueRange: ClosedFloatingPointRange<Float>,
+    modifier: Modifier = Modifier,
+    onValueChange: (Float) -> Unit,
+) {
+    Slider(
+        value = value,
+        onValueChange = onValueChange,
+        colors = SliderDefaults.colors(
+            activeTrackColor = MaterialTheme.colorScheme.surface,
+            activeTickColor = MaterialTheme.colorScheme.surface,
+            inactiveTrackColor = MaterialTheme.colorScheme.primary,
+            inactiveTickColor = MaterialTheme.colorScheme.primary,
+        ),
+        valueRange = valueRange,
+        steps = valueRange.endInclusive.toInt() - valueRange.start.toInt() + 1,
+        thumb =  { sliderPositions ->
+            Surface(
+                shape = MaterialTheme.shapes.extraSmall,
+                color = if (valueRange.start == value) MaterialTheme.colorScheme.tertiary
+                    else MaterialTheme.colorScheme.surface,
+                modifier = Modifier.size(20.dp)
+            ) {
+                if (sliderPositions.activeRange.start == value) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.cross),
+                        tint = MaterialTheme.colorScheme.onTertiary,
+                        contentDescription = "zero",
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+        },
+        modifier = modifier,
+    )
 }
