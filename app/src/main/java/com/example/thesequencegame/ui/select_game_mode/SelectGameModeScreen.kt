@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.thesequencegame.R
 import com.example.thesequencegame.ui.common_components.SequenceButton
 import com.example.thesequencegame.ui.common_components.SequenceIconButton
@@ -24,6 +25,7 @@ import com.example.thesequencegame.ui.common_components.SequenceNavigationDrawer
 import com.example.thesequencegame.ui.common_components.SequenceTitle
 import com.example.thesequencegame.ui.common_components.SequenceTopBar
 import com.example.thesequencegame.ui.destinations.GameScreenDestination
+import com.example.thesequencegame.ui.game.GameMode
 import com.example.thesequencegame.ui.theme.SequenceTypography
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -33,9 +35,11 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Destination
 @Composable
 fun SelectGameModeScreen(
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    viewModel: SelectGameModeViewModel = viewModel(),
 ) {
     var showHowToPlayDialog by remember { mutableStateOf(false) }
+    var showClassicSettingsDialog by remember { mutableStateOf(false) }
 
     SequenceNavigationDrawer(navigator) { extendDrawer ->
         Column(
@@ -78,7 +82,9 @@ fun SelectGameModeScreen(
                     onClick = {
                         navigator.navigate(GameScreenDestination())
                     },
-                    onSettingsClick = { /* TODO */ },
+                    onSettingsClick = {
+                        showClassicSettingsDialog = true
+                    },
                     modifier = Modifier.weight(0.15f)
                 )
 
@@ -104,6 +110,14 @@ fun SelectGameModeScreen(
     if (showHowToPlayDialog) {
         HowToPlayDialog {
             showHowToPlayDialog = false
+        }
+    }
+    if (showClassicSettingsDialog) {
+        ModeSettingsDialog(
+            viewModel = viewModel,
+            mode = GameMode.CLASSIC
+        ) {
+            showClassicSettingsDialog = false
         }
     }
 }

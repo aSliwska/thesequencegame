@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +19,10 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -32,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Popup
 import com.example.thesequencegame.R
 import com.example.thesequencegame.ui.theme.SequenceTypography
 
@@ -235,4 +240,95 @@ fun SequenceSlider(
         },
         modifier = modifier,
     )
+}
+@Composable
+fun SequenceDropDownMenu(
+    chosenOption: Int,
+    options: Map<Int, String>,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(modifier = modifier) {
+        // not expanded content
+        SequenceDropDownMenuHeader(
+            expanded = expanded,
+            text = options[chosenOption]!!, // TODO !! null cast :/
+            onClick = { expanded = true },
+        )
+
+        if (expanded) {
+            Popup(
+                onDismissRequest = { expanded = false },
+            ) {
+                Surface(
+                    color = MaterialTheme.colorScheme.inverseSurface,
+                    shape = MaterialTheme.shapes.large,
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start,
+                    ) {
+                        SequenceDropDownMenuHeader(
+                            expanded = expanded,
+                            text = options[chosenOption]!!, // TODO !! null cast :/
+                            onClick = { expanded = false },
+                        )
+
+                        for (option in options) {
+                            if (option.value != options[chosenOption]) {
+                                Row(
+                                    horizontalArrangement = Arrangement.Start,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .padding(top = 12.dp, bottom = 12.dp, end = 8.dp, start = 16.dp)
+                                        .clickable {
+                                            expanded = false
+                                            /*TODO*/
+                                        }
+                                ) {
+                                    Text(
+                                        text = option.value,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SequenceDropDownMenuHeader(
+    expanded: Boolean,
+    text: String,
+    onClick: () -> Unit,
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.primary,
+        shape = MaterialTheme.shapes.large,
+        onClick = onClick
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 12.dp, bottom = 12.dp, end = 8.dp, start = 16.dp)
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Icon(
+                painter = painterResource(
+                    id = if (expanded) R.drawable.arrow_up
+                    else R.drawable.arrow_down
+                ),
+                contentDescription = "drop down menu"
+            )
+        }
+    }
 }
